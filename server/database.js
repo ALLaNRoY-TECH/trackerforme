@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const usePostgres = !!process.env.DATABASE_URL;
+const isVercel = !!process.env.VERCEL;
 
 let db;
 let pool;
@@ -15,13 +16,15 @@ if (usePostgres) {
     ssl: {
       rejectUnauthorized: false
     },
-    connectionTimeoutMillis: 3000 // Fail fast (3s) if connection hangs (e.g. blocked port)
+    connectionTimeoutMillis: 5000 // Fail fast (5s) if connection hangs (e.g. blocked port)
   });
-} else {
+} else if (!isVercel) {
   console.log("Configuring SQLite database connection...");
   const sqlite3 = require('sqlite3').verbose();
   const dbPath = path.join(__dirname, 'db.sqlite');
   db = new sqlite3.Database(dbPath);
+} else {
+  console.log("Running on Vercel without DATABASE_URL. SQLite fallback is disabled.");
 }
 
 // Convert SQLite parameter placeholders (?) to PostgreSQL ($1, $2...)
@@ -106,6 +109,10 @@ const exec = async (sql) => {
 };
 
 async function initDb() {
+  if (isVercel && !usePostgres) {
+    throw new Error("DATABASE_URL environment variable is not configured. Please set it in your Vercel project settings.");
+  }
+
   if (isPostgresActive) {
     try {
       console.log("Verifying PostgreSQL connectivity...");
@@ -114,6 +121,9 @@ async function initDb() {
       console.log("PostgreSQL connection verified successfully.");
     } catch (pgErr) {
       console.warn("PostgreSQL connection failed to establish:", pgErr.message);
+      if (isVercel) {
+        throw new Error("PostgreSQL connection failed: " + pgErr.message);
+      }
       console.warn("Falling back to local SQLite database...");
       isPostgresActive = false;
       
