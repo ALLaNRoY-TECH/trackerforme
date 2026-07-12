@@ -4,8 +4,12 @@ const BASE_URL = '';
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
   
-  // Ensure credentials are sent (cookies containing JWT)
-  options.credentials = 'include';
+  // Attach x-username header for passwordless switching
+  const selectedProfile = localStorage.getItem('selectedProfile') || 'aroy';
+  options.headers = {
+    ...options.headers,
+    'x-username': selectedProfile
+  };
   
   if (options.body && typeof options.body === 'object') {
     options.headers = {
@@ -57,5 +61,6 @@ export const api = {
 
   // Analytics & Stats
   getCalendar: () => request('/api/stats/calendar', { method: 'GET' }),
-  getAnalytics: () => request('/api/stats/analytics', { method: 'GET' })
+  getAnalytics: () => request('/api/stats/analytics', { method: 'GET' }),
+  getComparison: () => request('/api/stats/comparison', { method: 'GET' })
 };

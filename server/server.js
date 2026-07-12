@@ -68,21 +68,31 @@ function getLocalDateString() {
 
 // Authentication Middleware
 async function requireAuth(req, res, next) {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ error: "Access denied. No token provided." });
-  }
+  const username = req.headers['x-username'] || 'aroy';
+  const cleanName = username.toLowerCase().trim();
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await db.get("SELECT id, name, email, current_day, created_at FROM users WHERE id = ?", [decoded.id]);
+    let user = await db.get("SELECT id, name, email, current_day, created_at FROM users WHERE LOWER(name) = ?", [cleanName]);
     if (!user) {
-      return res.status(401).json({ error: "Invalid session. User not found." });
+      // Auto-create user if they don't exist
+      const email = `${cleanName}@tracker.com`;
+      const result = await db.run(
+        "INSERT INTO users (name, email, password_hash, current_day) VALUES (?, ?, ?, 0)",
+        [cleanName, email, 'no-password-needed']
+      );
+      user = {
+        id: result.id,
+        name: cleanName,
+        email: email,
+        current_day: 0,
+        created_at: new Date().toISOString()
+      };
     }
     req.user = user;
     next();
   } catch (err) {
-    res.status(401).json({ error: "Session expired or invalid token." });
+    console.error("Auth middleware error:", err);
+    res.status(500).json({ error: "Failed to authenticate profile workspace." });
   }
 }
 
@@ -720,6 +730,124 @@ app.get('/api/stats/analytics', requireAuth, async (req, res) => {
   } catch (err) {
     console.error("Analytics fetch error:", err);
     res.status(500).json({ error: "Failed to generate analytics dashboard data." });
+  }
+});
+
+// Helper to calculate stats for comparison dashboard
+async function getUserStats(userId) {
+  const totalMinutesRow = await db.get(
+    "SELECT SUM(total_minutes_studied) AS total FROM daily_log WHERE user_id = ?",
+    [userId]
+  );
+  const totalHours = (totalMinutesRow ? parseFloat(totalMinutesRow.total || 0) : 0) / 60;
+
+  const dsaCompletedRow = await db.get(
+    "SELECT COUNT(*) as cnt FROM user_day_progress WHERE user_id = ? AND dsa_completed = 1",
+    [userId]
+  );
+  const cyberCompletedRow = await db.get(
+    "SELECT COUNT(*) as cnt FROM user_day_progress WHERE user_id = ? AND cyber_completed = 1",
+    [userId]
+  );
+  const completedTopics = (dsaCompletedRow ? dsaCompletedRow.cnt : 0) + (cyberCompletedRow ? cyberCompletedRow.cnt : 0);
+
+  const studiedDatesList = await db.all(
+    "SELECT DISTINCT date FROM daily_log WHERE user_id = ? AND total_minutes_studied > 0 ORDER BY date ASC",
+    [userId]
+  );
+  const studiedDates = studiedDatesList.map(row => row.date);
+  
+  let currentStreak = 0;
+  if (studiedDates.length > 0) {
+    const isConsecutive = (d1Str, d2Str) => {
+      const d1 = new Date(d1Str);
+      const d2 = new Date(d2Str);
+      const diffTime = Math.abs(d2 - d1);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays === 1;
+    };
+
+    const todayStr = getLocalDateString();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    const lastStudiedDate = studiedDates[studiedDates.length - 1];
+
+    if (lastStudiedDate === todayStr || lastStudiedDate === yesterdayStr) {
+      currentStreak = 1;
+      for (let i = studiedDates.length - 1; i > 0; i--) {
+        if (isConsecutive(studiedDates[i - 1], studiedDates[i])) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+    }
+  }
+
+  return {
+    total_hours: totalHours,
+    current_streak: currentStreak,
+    completed_topics: completedTopics
+  };
+}
+
+// COMPETITIVE LEADERBOARD ENDPOINT
+app.get('/api/stats/comparison', async (req, res) => {
+  try {
+    let aroyUser = await db.get("SELECT id, name FROM users WHERE LOWER(name) = 'aroy'");
+    if (!aroyUser) {
+      const result = await db.run("INSERT INTO users (name, email, password_hash, current_day) VALUES ('aroy', 'aroy@tracker.com', 'no-password', 0)");
+      aroyUser = { id: result.id, name: 'aroy' };
+    }
+    
+    let bubuUser = await db.get("SELECT id, name FROM users WHERE LOWER(name) = 'bubu'");
+    if (!bubuUser) {
+      const result = await db.run("INSERT INTO users (name, email, password_hash, current_day) VALUES ('bubu', 'bubu@tracker.com', 'no-password', 0)");
+      bubuUser = { id: result.id, name: 'bubu' };
+    }
+
+    const aroyStats = await getUserStats(aroyUser.id);
+    const bubuStats = await getUserStats(bubuUser.id);
+
+    let leader = 'aroy';
+    let difference = 0;
+    if (bubuStats.total_hours > aroyStats.total_hours) {
+      leader = 'bubu';
+      difference = bubuStats.total_hours - aroyStats.total_hours;
+    } else {
+      difference = aroyStats.total_hours - bubuStats.total_hours;
+    }
+
+    let tip = "";
+    if (aroyStats.total_hours === 0 && bubuStats.total_hours === 0) {
+      tip = "The race hasn't started yet! Start studying to take the lead.";
+    } else if (difference === 0) {
+      tip = `It's a dead heat! Both are neck and neck at ${aroyStats.total_hours.toFixed(1)} hours. Who will break the tie?`;
+    } else {
+      const runnerUp = leader === 'aroy' ? 'bubu' : 'aroy';
+      const hoursStr = difference.toFixed(1);
+      
+      const tipsList = [
+        `${leader} is leading by ${hoursStr} hours! ${runnerUp}, check in for a 2-hour study session today to close the gap!`,
+        `${leader} is ahead by ${hoursStr} hours! Come on ${runnerUp}, push your streaks and take back the crown!`,
+        `${leader} has logged ${hoursStr} hours more than you, ${runnerUp}. Consistency is key – double down on DSA tasks!`,
+        `Don't let ${leader} get too far ahead! ${runnerUp}, complete a daily topic to secure additional consistency points!`
+      ];
+      tip = tipsList[Math.floor(Math.random() * tipsList.length)];
+    }
+
+    res.json({
+      aroy: aroyStats,
+      bubu: bubuStats,
+      leader,
+      difference,
+      tip
+    });
+  } catch (err) {
+    console.error("Comparison stats error:", err);
+    res.status(500).json({ error: "Failed to load competitive statistics." });
   }
 });
 

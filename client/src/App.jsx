@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Login from './components/Login';
-import Register from './components/Register';
+import LeaderboardDashboard from './components/LeaderboardDashboard';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import CurriculumOverview from './components/CurriculumOverview';
@@ -9,19 +8,29 @@ import Analytics from './components/Analytics';
 import { api } from './utils/api';
 
 export default function App() {
+  const [selectedProfile, setSelectedProfile] = useState(localStorage.getItem('selectedProfile') || null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
   
   // Triggers analytics and calendar stats refresh when study events finish
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [analytics, setAnalytics] = useState(null);
 
-  // Validate authentication on load
+  // Apply theme on initial load
   useEffect(() => {
-    checkAuth();
+    const theme = localStorage.getItem('selectedTheme') || 'green-black';
+    if (theme === 'green-black') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   }, []);
+
+  // Validate session/profile on load or profile switch
+  useEffect(() => {
+    checkProfile();
+  }, [selectedProfile]);
 
   // Sync analytics whenever user's active day updates or sessions finish
   useEffect(() => {
@@ -30,11 +39,19 @@ export default function App() {
     }
   }, [user, refreshTrigger]);
 
-  const checkAuth = async () => {
+  const checkProfile = async () => {
+    if (!selectedProfile) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
       const data = await api.getMe();
       setUser(data.user);
     } catch (err) {
+      console.error("Failed to load user profile:", err);
       setUser(null);
     } finally {
       setLoading(false);
@@ -50,22 +67,16 @@ export default function App() {
     }
   };
 
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
+  const handleSelectProfile = (profileName) => {
+    localStorage.setItem('selectedProfile', profileName);
+    setSelectedProfile(profileName);
   };
 
-  const handleRegisterSuccess = (userData) => {
-    setUser(userData);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await api.logout();
-      setUser(null);
-      setActiveTab('dashboard');
-    } catch (err) {
-      console.error(err);
-    }
+  const handleSwitchProfile = () => {
+    localStorage.removeItem('selectedProfile');
+    setSelectedProfile(null);
+    setUser(null);
+    setActiveTab('dashboard');
   };
 
   const handleDayAdvanced = (newDayNumber) => {
@@ -82,36 +93,28 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070b13] flex flex-col items-center justify-center gap-4 text-white">
+      <div className="min-h-screen bg-darkBg flex flex-col items-center justify-center gap-4 text-glow-emerald">
         <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin" />
-        <p className="text-sm text-gray-400 font-semibold tracking-wide">Validating session security credentials...</p>
+        <p className="text-sm font-semibold tracking-wide">Synchronizing profile dataset...</p>
       </div>
     );
   }
 
-  // Not logged in -> Auth views
-  if (!user) {
-    return authView === 'login' ? (
-      <Login 
-        onLoginSuccess={handleLoginSuccess} 
-        onSwitchToRegister={() => setAuthView('register')} 
-      />
-    ) : (
-      <Register 
-        onRegisterSuccess={handleRegisterSuccess} 
-        onSwitchToLogin={() => setAuthView('login')} 
-      />
+  // No profile selected -> Show competitive landing board
+  if (!selectedProfile || !user) {
+    return (
+      <LeaderboardDashboard onSelectProfile={handleSelectProfile} />
     );
   }
 
-  // Logged in -> App Dashboard
+  // Profile selected -> App Dashboard
   return (
-    <div className="min-h-screen bg-[#070b13] pb-12 flex flex-col">
+    <div className="min-h-screen bg-darkBg pb-12 flex flex-col transition-colors duration-300">
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         user={user} 
-        onLogout={handleLogout}
+        onSwitchProfile={handleSwitchProfile}
         analytics={analytics}
       />
 

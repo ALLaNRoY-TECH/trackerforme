@@ -6,10 +6,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        darkBg: '#0b0f19',
-        darkCard: '#131c2e',
-        accentPrimary: '#10b981', // Emerald green
-        accentSecondary: '#6366f1', // Indigo blue
+        darkBg: 'var(--bg-color)',
+        darkCard: 'var(--card-bg)',
+        emerald: {
+          300: 'rgb(var(--accent-emerald-300) / <alpha-value>)',
+          400: 'rgb(var(--accent-emerald-400) / <alpha-value>)',
+          500: 'rgb(var(--accent-emerald-500) / <alpha-value>)',
+          600: 'rgb(var(--accent-emerald-600) / <alpha-value>)',
+        },
+        indigo: {
+          300: 'rgb(var(--accent-indigo-300) / <alpha-value>)',
+          400: 'rgb(var(--accent-indigo-400) / <alpha-value>)',
+          500: 'rgb(var(--accent-indigo-500) / <alpha-value>)',
+          600: 'rgb(var(--accent-indigo-600) / <alpha-value>)',
+        }
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
