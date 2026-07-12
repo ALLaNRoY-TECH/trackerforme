@@ -27,21 +27,28 @@ app.use(cookieParser());
 
 // Initialize Database with promise tracking
 let dbInitialized = false;
+let dbInitError = null;
 const dbInitPromise = db.initDb().then(() => {
   dbInitialized = true;
   console.log("Database successfully loaded.");
 }).catch(err => {
-  console.error("Critical database error:", err);
-  throw err;
+  console.error("Critical database error on startup:", err);
+  dbInitError = err;
 });
 
 // Middleware to await database initialization
 app.use((req, res, next) => {
   if (dbInitialized) {
     next();
+  } else if (dbInitError) {
+    res.status(500).json({ error: "Database failed to initialize: " + dbInitError.message });
   } else {
-    dbInitPromise.then(() => next()).catch(err => {
-      res.status(500).json({ error: "Database failed to initialize: " + err.message });
+    dbInitPromise.then(() => {
+      if (dbInitError) {
+        res.status(500).json({ error: "Database failed to initialize: " + dbInitError.message });
+      } else {
+        next();
+      }
     });
   }
 });
