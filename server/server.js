@@ -25,11 +25,25 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Initialize Database
-db.initDb().then(() => {
+// Initialize Database with promise tracking
+let dbInitialized = false;
+const dbInitPromise = db.initDb().then(() => {
+  dbInitialized = true;
   console.log("Database successfully loaded.");
 }).catch(err => {
   console.error("Critical database error:", err);
+  throw err;
+});
+
+// Middleware to await database initialization
+app.use((req, res, next) => {
+  if (dbInitialized) {
+    next();
+  } else {
+    dbInitPromise.then(() => next()).catch(err => {
+      res.status(500).json({ error: "Database failed to initialize: " + err.message });
+    });
+  }
 });
 
 // Helper for local date string in YYYY-MM-DD
