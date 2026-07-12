@@ -192,6 +192,17 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({ user: req.user });
 });
 
+// PUBLIC CURRICULUM ENDPOINT (No Auth required)
+app.get('/api/curriculum/public', async (req, res) => {
+  try {
+    const curriculumDays = await db.all("SELECT day_number, dsa_topic, cyber_topic FROM curriculum_days ORDER BY day_number ASC");
+    res.json({ curriculum: curriculumDays });
+  } catch (err) {
+    console.error("Public curriculum fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch public curriculum list." });
+  }
+});
+
 // CURRICULUM OVERVIEW ENDPOINT
 app.get('/api/curriculum', requireAuth, async (req, res) => {
   try {
@@ -796,20 +807,22 @@ async function getUserStats(userId) {
 // COMPETITIVE LEADERBOARD ENDPOINT
 app.get('/api/stats/comparison', async (req, res) => {
   try {
-    let aroyUser = await db.get("SELECT id, name FROM users WHERE LOWER(name) = 'aroy'");
+    let aroyUser = await db.get("SELECT id, name, current_day FROM users WHERE LOWER(name) = 'aroy'");
     if (!aroyUser) {
       const result = await db.run("INSERT INTO users (name, email, password_hash, current_day) VALUES ('aroy', 'aroy@tracker.com', 'no-password', 0)");
-      aroyUser = { id: result.id, name: 'aroy' };
+      aroyUser = { id: result.id, name: 'aroy', current_day: 0 };
     }
     
-    let bubuUser = await db.get("SELECT id, name FROM users WHERE LOWER(name) = 'bubu'");
+    let bubuUser = await db.get("SELECT id, name, current_day FROM users WHERE LOWER(name) = 'bubu'");
     if (!bubuUser) {
       const result = await db.run("INSERT INTO users (name, email, password_hash, current_day) VALUES ('bubu', 'bubu@tracker.com', 'no-password', 0)");
-      bubuUser = { id: result.id, name: 'bubu' };
+      bubuUser = { id: result.id, name: 'bubu', current_day: 0 };
     }
 
     const aroyStats = await getUserStats(aroyUser.id);
+    aroyStats.current_day = aroyUser.current_day;
     const bubuStats = await getUserStats(bubuUser.id);
+    bubuStats.current_day = bubuUser.current_day;
 
     let leader = 'aroy';
     let difference = 0;

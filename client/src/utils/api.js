@@ -47,6 +47,7 @@ export const api = {
 
   // Curriculum overview
   getCurriculum: () => request('/api/curriculum', { method: 'GET' }),
+  getPublicCurriculum: () => request('/api/curriculum/public', { method: 'GET' }),
   getCurriculumDay: (dayNum) => request(`/api/curriculum/day/${dayNum}`, { method: 'GET' }),
 
   // Dashboard today tasks

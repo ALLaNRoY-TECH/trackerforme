@@ -12,6 +12,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [profileError, setProfileError] = useState(null);
   
   // Triggers analytics and calendar stats refresh when study events finish
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -48,10 +49,12 @@ export default function App() {
 
     try {
       setLoading(true);
+      setProfileError(null);
       const data = await api.getMe();
       setUser(data.user);
     } catch (err) {
       console.error("Failed to load user profile:", err);
+      setProfileError("Could not connect to the profile workspace. Please make sure your backend server is running and database is connected!");
       setUser(null);
     } finally {
       setLoading(false);
@@ -68,6 +71,7 @@ export default function App() {
   };
 
   const handleSelectProfile = (profileName) => {
+    setProfileError(null);
     localStorage.setItem('selectedProfile', profileName);
     setSelectedProfile(profileName);
   };
@@ -76,6 +80,7 @@ export default function App() {
     localStorage.removeItem('selectedProfile');
     setSelectedProfile(null);
     setUser(null);
+    setProfileError(null);
     setActiveTab('dashboard');
   };
 
@@ -103,7 +108,11 @@ export default function App() {
   // No profile selected -> Show competitive landing board
   if (!selectedProfile || !user) {
     return (
-      <LeaderboardDashboard onSelectProfile={handleSelectProfile} />
+      <LeaderboardDashboard 
+        onSelectProfile={handleSelectProfile} 
+        profileError={profileError}
+        clearProfileError={() => setProfileError(null)}
+      />
     );
   }
 

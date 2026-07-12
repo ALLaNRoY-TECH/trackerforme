@@ -2,126 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Themes Definition */
+/* Sleek Monochrome (Black & White) Design System */
 :root {
-  /* Default: Green & Black Theme */
-  --bg-color: #030504;
-  --card-bg: rgba(6, 12, 8, 0.8);
-  --card-border: rgba(16, 185, 129, 0.15);
-  --text-color: #e2e8f0;
-  --text-muted: #94a3b8;
-  --input-bg: rgba(2, 6, 4, 0.9);
-  --input-focus-border: #10b981;
+  --bg-color: #000000;
+  --card-bg: rgba(9, 9, 11, 0.85);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-color: #fafafa;
+  --text-muted: #a1a1aa;
+  --input-bg: rgba(9, 9, 11, 0.95);
+  --input-focus-border: #ffffff;
 
-  --accent-emerald-300: 134 239 172;
-  --accent-emerald-400: 74 222 128;
-  --accent-emerald-500: 16 185 129;
-  --accent-emerald-600: 5 150 105;
+  /* Map standard colors to premium monochrome scales */
+  --accent-emerald-300: 244 244 245; /* zinc-100 */
+  --accent-emerald-400: 228 228 231; /* zinc-200 */
+  --accent-emerald-500: 255 255 255; /* white */
+  --accent-emerald-600: 161 161 170; /* zinc-400 */
 
-  --accent-indigo-300: 134 239 172;
-  --accent-indigo-400: 74 222 128;
-  --accent-indigo-500: 16 185 129;
-  --accent-indigo-600: 5 150 105;
-}
-
-[data-theme="dark"] {
-  --bg-color: #070b13;
-  --card-bg: rgba(13, 20, 35, 0.65);
-  --card-border: rgba(255, 255, 255, 0.05);
-  --text-color: #e2e8f0;
-  --text-muted: #94a3b8;
-  --input-bg: rgba(10, 15, 28, 0.8);
-  --input-focus-border: #6366f1;
-
-  --accent-emerald-300: 134 239 172;
-  --accent-emerald-400: 74 222 128;
-  --accent-emerald-500: 16 185 129;
-  --accent-emerald-600: 5 150 105;
-
-  --accent-indigo-300: 165 180 252;
-  --accent-indigo-400: 129 140 248;
-  --accent-indigo-500: 99 102 241;
-  --accent-indigo-600: 79 70 229;
-}
-
-[data-theme="light"] {
-  --bg-color: #f8fafc;
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(15, 23, 42, 0.08);
-  --text-color: #0f172a;
-  --text-muted: #64748b;
-  --input-bg: #ffffff;
-  --input-focus-border: #3b82f6;
-
-  --accent-emerald-300: 134 239 172;
-  --accent-emerald-400: 74 222 128;
-  --accent-emerald-500: 16 185 129;
-  --accent-emerald-600: 5 150 105;
-
-  --accent-indigo-300: 147 197 253;
-  --accent-indigo-400: 96 165 250;
-  --accent-indigo-500: 59 130 246;
-  --accent-indigo-600: 37 99 235;
-}
-
-[data-theme="beige"] {
-  --bg-color: #f5f2eb;
-  --card-bg: rgba(240, 235, 224, 0.95);
-  --card-border: rgba(120, 90, 70, 0.15);
-  --text-color: #3e2723;
-  --text-muted: #8d6e63;
-  --input-bg: #faf8f5;
-  --input-focus-border: #5d4037;
-
-  --accent-emerald-300: 221 161 94;
-  --accent-emerald-400: 188 108 37;
-  --accent-emerald-500: 165 117 72;
-  --accent-emerald-600: 141 110 99;
-
-  --accent-indigo-300: 141 110 99;
-  --accent-indigo-400: 121 85 72;
-  --accent-indigo-500: 93 64 55;
-  --accent-indigo-600: 62 39 35;
-}
-
-[data-theme="red"] {
-  --bg-color: #0b0303;
-  --card-bg: rgba(26, 8, 8, 0.75);
-  --card-border: rgba(239, 68, 68, 0.18);
-  --text-color: #fca5a5;
-  --text-muted: #f87171;
-  --input-bg: rgba(18, 6, 6, 0.9);
-  --input-focus-border: #ef4444;
-
-  --accent-emerald-300: 252 165 165;
-  --accent-emerald-400: 248 113 113;
-  --accent-emerald-500: 239 68 68;
-  --accent-emerald-600: 220 38 38;
-
-  --accent-indigo-300: 254 202 202;
-  --accent-indigo-400: 239 68 68;
-  --accent-indigo-500: 185 28 28;
-  --accent-indigo-600: 153 27 27;
-}
-
-[data-theme="green"] {
-  --bg-color: #030704;
-  --card-bg: rgba(8, 20, 12, 0.8);
-  --card-border: rgba(34, 197, 94, 0.2);
-  --text-color: #dcfce7;
-  --text-muted: #86efac;
-  --input-bg: rgba(4, 10, 6, 0.9);
-  --input-focus-border: #22c55e;
-
-  --accent-emerald-300: 134 239 172;
-  --accent-emerald-400: 74 222 128;
-  --accent-emerald-500: 16 185 129;
-  --accent-emerald-600: 5 150 105;
-
-  --accent-indigo-300: 168 244 200;
-  --accent-indigo-400: 74 222 128;
-  --accent-indigo-500: 34 197 94;
-  --accent-indigo-600: 21 128 61;
+  --accent-indigo-300: 244 244 245;
+  --accent-indigo-400: 228 228 231;
+  --accent-indigo-500: 255 255 255;
+  --accent-indigo-600: 161 161 170;
 }
 
 @layer base {
@@ -129,7 +29,7 @@
     background-color: var(--bg-color);
     color: var(--text-color);
     transition: background-color 0.3s ease, color 0.3s ease;
-    @apply font-sans antialiased min-h-screen selection:bg-emerald-500/30 selection:text-emerald-300;
+    @apply font-sans antialiased min-h-screen selection:bg-white/20 selection:text-white;
   }
 }
 
@@ -157,16 +57,16 @@
 
 .glass-input:focus {
   border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
   outline: none;
 }
 
 .text-glow-emerald {
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
 .text-glow-indigo {
-  text-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
 /* Custom Scrollbars */
@@ -180,22 +80,22 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Calendar grid cell states */
 .day-missed {
-  border: 1px solid rgba(239, 68, 68, 0.15);
-  background: rgba(239, 68, 68, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.01);
 }
 
 .day-studied {
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  background: rgba(16, 185, 129, 0.15);
-  box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.03);
 }

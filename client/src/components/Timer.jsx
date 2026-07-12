@@ -95,22 +95,22 @@ export default function Timer({ onSessionEnd }) {
   };
 
   return (
-    <div className="glass-card rounded-2xl p-6 glow-indigo relative overflow-hidden">
+    <div className="glass-card rounded-2xl p-6 relative overflow-hidden border border-white/10">
       {/* Background visual cue for studied state */}
       {checkedIn && (
-        <div className="absolute inset-0 bg-indigo-500/5 animate-pulse pointer-events-none" />
+        <div className="absolute inset-0 bg-white/5 animate-pulse pointer-events-none" />
       )}
 
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
         
         {/* Title and stats */}
         <div className="flex items-center gap-4">
-          <div className={`p-3.5 rounded-xl ${checkedIn ? 'bg-indigo-500/20 text-indigo-400 animate-pulse' : 'bg-white/5 text-gray-400'}`}>
+          <div className={`p-3.5 rounded-xl ${checkedIn ? 'bg-white/10 text-white animate-pulse' : 'bg-white/5 text-zinc-400'}`}>
             <TimerIcon size={24} />
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">Study Session Timer</h2>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-zinc-400">
               {checkedIn 
                 ? `Currently studying: ${track.toUpperCase()}` 
                 : 'Check in to log study hours'}
@@ -119,7 +119,7 @@ export default function Timer({ onSessionEnd }) {
         </div>
 
         {/* Live Timer Counter */}
-        <div className="text-3xl md:text-4xl font-mono font-bold tracking-widest text-white text-glow-indigo">
+        <div className="text-3xl md:text-4xl font-mono font-bold tracking-widest text-white text-glow-emerald">
           {formatTime(seconds)}
         </div>
 
@@ -132,7 +132,7 @@ export default function Timer({ onSessionEnd }) {
                 <button
                   onClick={() => setTrack('dsa')}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-md font-medium transition-colors ${
-                    track === 'dsa' ? 'bg-indigo-500 text-white' : 'text-gray-400 hover:text-white'
+                    track === 'dsa' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
                   }`}
                   disabled={loading}
                 >
@@ -142,7 +142,7 @@ export default function Timer({ onSessionEnd }) {
                 <button
                   onClick={() => setTrack('cyber')}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-md font-medium transition-colors ${
-                    track === 'cyber' ? 'bg-emerald-500 text-black' : 'text-gray-400 hover:text-white'
+                    track === 'cyber' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
                   }`}
                   disabled={loading}
                 >
@@ -152,7 +152,7 @@ export default function Timer({ onSessionEnd }) {
                 <button
                   onClick={() => setTrack('both')}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-md font-medium transition-colors ${
-                    track === 'both' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'
+                    track === 'both' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
                   }`}
                   disabled={loading}
                 >
@@ -164,7 +164,7 @@ export default function Timer({ onSessionEnd }) {
               <button
                 onClick={handleCheckIn}
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 text-black font-semibold text-sm hover:bg-emerald-400 transition-all focus:outline-none"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all focus:outline-none cursor-pointer"
               >
                 <Play size={16} fill="black" />
                 Check In
@@ -174,9 +174,9 @@ export default function Timer({ onSessionEnd }) {
             <button
               onClick={handleCheckOut}
               disabled={loading}
-              className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-red-500 text-white font-semibold text-sm hover:bg-red-600 transition-all focus:outline-none shadow-lg shadow-red-500/10"
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-white text-white font-semibold text-sm hover:bg-white hover:text-black transition-all focus:outline-none shadow-lg shadow-white/5"
             >
-              <Square size={14} fill="white" />
+              <Square size={14} fill="currentColor" />
               Check Out
             </button>
           )}

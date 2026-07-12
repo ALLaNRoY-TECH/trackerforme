@@ -82,8 +82,8 @@ export default function CalendarView({ user, analytics }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin" />
-        <p className="text-sm text-gray-400 font-medium">Assembling calendar matrix...</p>
+        <div className="w-12 h-12 rounded-full border-4 border-white/10 border-t-white animate-spin" />
+        <p className="text-sm text-zinc-400 font-medium">Assembling calendar matrix...</p>
       </div>
     );
   }
@@ -94,11 +94,11 @@ export default function CalendarView({ user, analytics }) {
       {/* Calendar Header with Streaks */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card rounded-2xl p-5 border border-white/5 flex items-center gap-4">
-          <div className="p-3.5 bg-amber-500/10 rounded-xl text-amber-400">
-            <Flame size={20} className="fill-amber-400/25" />
+          <div className="p-3.5 bg-white/5 rounded-xl text-white">
+            <Flame size={20} className="fill-white/10" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Current Streak</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Current Streak</p>
             <p className="text-xl font-extrabold text-white">
               {analytics ? analytics.current_streak : 0} Days
             </p>
@@ -106,11 +106,11 @@ export default function CalendarView({ user, analytics }) {
         </div>
 
         <div className="glass-card rounded-2xl p-5 border border-white/5 flex items-center gap-4">
-          <div className="p-3.5 bg-emerald-500/10 rounded-xl text-emerald-400">
-            <Flame size={20} className="fill-emerald-400/25" />
+          <div className="p-3.5 bg-white/5 rounded-xl text-white">
+            <Flame size={20} className="fill-white/10" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Longest Streak</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Longest Streak</p>
             <p className="text-xl font-extrabold text-white">
               {analytics ? analytics.longest_streak : 0} Days
             </p>
@@ -118,11 +118,11 @@ export default function CalendarView({ user, analytics }) {
         </div>
 
         <div className="glass-card rounded-2xl p-5 border border-white/5 flex items-center gap-4">
-          <div className="p-3.5 bg-indigo-500/10 rounded-xl text-indigo-400">
+          <div className="p-3.5 bg-white/5 rounded-xl text-white">
             <Clock size={20} />
           </div>
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Consistency</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Consistency</p>
             <p className="text-xl font-extrabold text-white">
               {analytics ? analytics.consistency_percentage : 0}% Study Days
             </p>
@@ -137,26 +137,26 @@ export default function CalendarView({ user, analytics }) {
         <div className="lg:col-span-2 glass-panel rounded-2xl p-6 border border-white/5 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <CalIcon size={18} className="text-emerald-400" />
+              <CalIcon size={18} className="text-white" />
               {monthNames[month]} {year}
             </h3>
             <div className="flex gap-2">
               <button 
                 onClick={handlePrevMonth}
-                className="p-2 rounded-lg border border-white/5 hover:border-white/10 hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg border border-white/5 hover:border-white/10 hover:bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
               <button 
                 onClick={handleNextMonth}
-                className="p-2 rounded-lg border border-white/5 hover:border-white/10 hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg border border-white/5 hover:border-white/10 hover:bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
               >
                 <ChevronRight size={16} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-zinc-500 uppercase tracking-wider">
             <span>Sun</span>
             <span>Mon</span>
             <span>Tue</span>
@@ -184,17 +184,17 @@ export default function CalendarView({ user, analytics }) {
                 <button
                   key={dateStr}
                   onClick={() => setSelectedDateStr(dateStr)}
-                  className={`aspect-square rounded-xl text-sm font-semibold flex flex-col items-center justify-center relative transition-all border ${cellClass} ${
-                    isSelected ? 'ring-2 ring-indigo-500 border-indigo-400 scale-[1.03] z-10' : ''
+                  className={`aspect-square rounded-xl text-sm font-semibold flex flex-col items-center justify-center relative transition-all border ${cellClass} cursor-pointer ${
+                    isSelected ? 'ring-2 ring-white border-white scale-[1.03] z-10' : ''
                   }`}
                 >
-                  <span className={data.studied ? 'text-emerald-400 font-bold' : 'text-gray-400'}>
+                  <span className={data.studied ? 'text-white font-bold' : 'text-zinc-500'}>
                     {day}
                   </span>
                   
                   {/* Visual bullet representing completed program day milestones */}
                   {data.completed_days && data.completed_days.length > 0 && (
-                    <span className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-md shadow-indigo-400/50" />
+                    <span className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full bg-white shadow-md shadow-white/30" />
                   )}
                 </button>
               );
@@ -206,7 +206,7 @@ export default function CalendarView({ user, analytics }) {
         <div className="glass-panel rounded-2xl p-6 border border-white/5 flex flex-col justify-between">
           <div className="space-y-6">
             <div>
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Selected Date</span>
+              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest block mb-1">Selected Date</span>
               <h4 className="text-xl font-bold text-white">
                 {new Date(selectedDateStr + 'T00:00:00').toLocaleDateString(undefined, {
                   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -218,11 +218,11 @@ export default function CalendarView({ user, analytics }) {
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <span className="p-2.5 rounded-lg bg-white/5 text-white">
                   <Clock size={16} />
                 </span>
                 <div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Duration Studied</span>
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Duration Studied</span>
                   <p className="text-sm font-semibold text-white">
                     {selectedData.studied 
                       ? `${Math.round(selectedData.minutes_studied)} minutes` 
@@ -232,11 +232,11 @@ export default function CalendarView({ user, analytics }) {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <span className="p-2.5 rounded-lg bg-white/5 text-white">
                   <BookOpen size={16} />
                 </span>
                 <div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Program Track Status</span>
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Program Track Status</span>
                   <p className="text-sm font-semibold text-white">
                     {selectedData.day_number_covered !== undefined
                       ? `Active Day: Day ${selectedData.day_number_covered}`
@@ -250,10 +250,10 @@ export default function CalendarView({ user, analytics }) {
               <>
                 <div className="h-px bg-white/5" />
                 <div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">Milestones Completed</span>
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest block mb-2">Milestones Completed</span>
                   <div className="flex flex-wrap gap-2">
                     {selectedData.completed_days.map((dayNum) => (
-                      <span key={dayNum} className="px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold">
+                      <span key={dayNum} className="px-2.5 py-1 rounded bg-white/10 border border-white/20 text-white text-xs font-bold">
                         Day {dayNum} Done
                       </span>
                     ))}
@@ -263,7 +263,7 @@ export default function CalendarView({ user, analytics }) {
             )}
           </div>
 
-          <div className="text-center text-xs text-gray-500 pt-6">
+          <div className="text-center text-xs text-zinc-600 pt-6">
             Click any cell on the grid to review its study records.
           </div>
         </div>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BookOpen, Calendar, BarChart2, CheckSquare, Flame, Award, Users, Palette } from 'lucide-react';
+import React from 'react';
+import { BookOpen, Calendar, BarChart2, CheckSquare, Flame, Award, Users } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, user, onSwitchProfile, analytics }) {
   const navItems = [
@@ -8,31 +8,6 @@ export default function Navbar({ activeTab, setActiveTab, user, onSwitchProfile,
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'analytics', label: 'Analytics', icon: BarChart2 }
   ];
-
-  const themes = [
-    { id: 'green-black', name: 'Green & Black', color: '#030504' },
-    { id: 'dark', name: 'Dark Mode', color: '#070b13' },
-    { id: 'light', name: 'Light Mode', color: '#cbd5e1' },
-    { id: 'beige', name: 'Beige Mode', color: '#d7ccc8' },
-    { id: 'red', name: 'Red Mode', color: '#991b1b' },
-    { id: 'green', name: 'Green Mode', color: '#166534' }
-  ];
-
-  const [activeTheme, setActiveTheme] = useState(localStorage.getItem('selectedTheme') || 'green-black');
-  const [showThemeMenu, setShowThemeMenu] = useState(false);
-
-  const handleThemeChange = (themeId) => {
-    setActiveTheme(themeId);
-    localStorage.setItem('selectedTheme', themeId);
-    if (themeId === 'green-black') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', themeId);
-    }
-    setShowThemeMenu(false);
-  };
-
-  const currentThemeColor = themes.find(t => t.id === activeTheme)?.color || '#10b981';
 
   return (
     <header className="glass-panel sticky top-0 z-50 px-4 md:px-8 py-4">
@@ -90,35 +65,7 @@ export default function Navbar({ activeTab, setActiveTab, user, onSwitchProfile,
         {/* User profile & Actions */}
         <div className="flex items-center gap-4 relative">
           
-          {/* Theme Quick Changer */}
-          <div className="relative">
-            <button
-              onClick={() => setShowThemeMenu(!showThemeMenu)}
-              className="p-2.5 rounded-lg border border-white/5 hover:border-emerald-500/30 text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/5 transition-all focus:outline-none flex items-center gap-1.5"
-              title="Change Theme"
-            >
-              <Palette size={16} />
-              <span className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: currentThemeColor }} />
-            </button>
 
-            {showThemeMenu && (
-              <div className="absolute right-0 mt-2 w-40 glass-panel rounded-xl shadow-2xl p-2 z-50 border border-white/10 animate-in fade-in slide-in-from-top-2 duration-200">
-                <p className="text-[10px] uppercase font-bold tracking-wider text-gray-400 px-2 py-1 mb-1">Select Theme</p>
-                {themes.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => handleThemeChange(t.id)}
-                    className="w-full text-left px-2 py-1.5 text-xs rounded-lg hover:bg-white/5 text-gray-300 hover:text-white flex items-center gap-2"
-                  >
-                    <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: t.color }} />
-                    {t.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="h-6 w-px bg-white/10" />
 
           {/* User profile label */}
           <div className="text-right hidden sm:block">

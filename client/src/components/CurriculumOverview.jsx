@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Unlock, Eye, X, BookOpen, ExternalLink, Code, Shield } from 'lucide-react';
+import { Lock, Unlock, Eye, X, BookOpen, Code, Shield } from 'lucide-react';
 import { api } from '../utils/api';
 
 export default function CurriculumOverview({ user }) {
@@ -50,8 +50,8 @@ export default function CurriculumOverview({ user }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin" />
-        <p className="text-sm text-gray-400 font-medium">Indexing curriculum logs...</p>
+        <div className="w-12 h-12 rounded-full border-4 border-white/10 border-t-white animate-spin" />
+        <p className="text-sm text-zinc-400 font-medium">Indexing curriculum logs...</p>
       </div>
     );
   }
@@ -63,10 +63,10 @@ export default function CurriculumOverview({ user }) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <BookOpen size={20} className="text-emerald-400" />
+            <BookOpen size={20} className="text-white" />
             Full Curriculum Index
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">Explore completed days or review your pending active tracks.</p>
+          <p className="text-xs text-zinc-500 mt-0.5">Explore completed days or review your pending active tracks.</p>
         </div>
 
         {/* Filter Tab controls */}
@@ -80,8 +80,8 @@ export default function CurriculumOverview({ user }) {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                filter === tab.id ? 'bg-emerald-500 text-black font-extrabold' : 'text-gray-400 hover:text-white'
+              className={`px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                filter === tab.id ? 'bg-white text-black font-extrabold' : 'text-zinc-400 hover:text-white'
               }`}
             >
               {tab.label}
@@ -97,17 +97,17 @@ export default function CurriculumOverview({ user }) {
           const isActive = day.day_number === user.current_day;
           const isLocked = day.day_number > user.current_day;
 
-          let statusClass = "border-white/5 bg-black/20 text-gray-500 cursor-not-allowed";
+          let statusClass = "border-white/5 bg-zinc-950/40 text-zinc-500 cursor-not-allowed border-dashed";
           let statusLabel = "Locked";
           let icon = <Lock size={14} />;
 
           if (isCompleted) {
-            statusClass = "border-emerald-500/20 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10 cursor-pointer hover:border-emerald-500/30";
+            statusClass = "border-white/20 bg-white/5 text-white hover:bg-white/10 cursor-pointer hover:border-white/40";
             statusLabel = "Completed";
             icon = <Unlock size={14} />;
           } else if (isActive) {
-            statusClass = "border-indigo-500/30 bg-indigo-500/5 text-indigo-400 hover:bg-indigo-500/10 cursor-pointer hover:border-indigo-500/50 ring-1 ring-indigo-500/20";
-            statusLabel = "Active (In Progress)";
+            statusClass = "border-white bg-white/10 text-white cursor-pointer ring-1 ring-white/20 hover:bg-white/15";
+            statusLabel = "Active";
             icon = <Unlock size={14} className="animate-pulse" />;
           }
 
@@ -129,14 +129,14 @@ export default function CurriculumOverview({ user }) {
                 <h4 className="text-sm font-bold text-white line-clamp-1 mb-1">
                   DSA: {day.dsa_topic}
                 </h4>
-                <p className="text-[11px] text-gray-400 line-clamp-1">
+                <p className="text-[11px] text-zinc-400 line-clamp-1">
                   Cyber: {day.cyber_topic}
                 </p>
               </div>
 
               {!isLocked && (
                 <div className="flex justify-end pt-3">
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-indigo-300">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-white hover:underline">
                     <Eye size={12} />
                     Review Tasks
                   </span>
@@ -157,11 +157,11 @@ export default function CurriculumOverview({ user }) {
               <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6">
                 <div>
                   <h3 className="text-xl font-bold text-white">Day {selectedDayDetail.day_number} Study Log</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">Read-only curriculum view</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">Read-only curriculum view</p>
                 </div>
                 <button
                   onClick={() => setSelectedDayDetail(null)}
-                  className="p-2 rounded-lg hover:bg-white/5 border border-white/5 text-gray-400 hover:text-white transition-colors"
+                  className="p-2 rounded-lg hover:bg-white/5 border border-white/5 text-zinc-400 hover:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -170,23 +170,23 @@ export default function CurriculumOverview({ user }) {
               {/* Tasks details */}
               <div className="space-y-6">
                 {/* DSA */}
-                <div className="space-y-3 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+                <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
                   <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Code size={16} className="text-indigo-400" />
+                    <Code size={16} className="text-white" />
                     DSA Topic: {selectedDayDetail.dsa_topic}
                   </h4>
-                  <p className="text-xs text-gray-400">
-                    <span className="font-bold text-gray-500">Resource:</span> {selectedDayDetail.dsa_resource}
+                  <p className="text-xs text-zinc-400">
+                    <span className="font-bold text-zinc-500">Resource:</span> {selectedDayDetail.dsa_resource}
                   </p>
                   <ul className="space-y-1.5 pt-2">
                     {selectedDayDetail.dsa_tasks.map((task, i) => {
                       const isCompleted = selectedDayDetail.dsa_tasks_completed.includes(task);
                       return (
                         <li key={i} className="flex items-center gap-2 text-xs">
-                          <span className={isCompleted ? 'text-emerald-400' : 'text-gray-600'}>
+                          <span className={isCompleted ? 'text-white' : 'text-zinc-600'}>
                             ●
                           </span>
-                          <span className={isCompleted ? 'line-through text-gray-500' : 'text-gray-300'}>
+                          <span className={isCompleted ? 'line-through text-zinc-500' : 'text-zinc-300'}>
                             {task}
                           </span>
                         </li>
@@ -196,23 +196,23 @@ export default function CurriculumOverview({ user }) {
                 </div>
 
                 {/* Cyber */}
-                <div className="space-y-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/10">
                   <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Shield size={16} className="text-emerald-400" />
+                    <Shield size={16} className="text-white" />
                     Cyber Topic: {selectedDayDetail.cyber_topic}
                   </h4>
-                  <p className="text-xs text-gray-400">
-                    <span className="font-bold text-gray-500">Resource:</span> {selectedDayDetail.cyber_resource}
+                  <p className="text-xs text-zinc-400">
+                    <span className="font-bold text-zinc-500">Resource:</span> {selectedDayDetail.cyber_resource}
                   </p>
                   <ul className="space-y-1.5 pt-2">
                     {selectedDayDetail.cyber_tasks.map((task, i) => {
                       const isCompleted = selectedDayDetail.cyber_tasks_completed.includes(task);
                       return (
                         <li key={i} className="flex items-center gap-2 text-xs">
-                          <span className={isCompleted ? 'text-emerald-400' : 'text-gray-600'}>
+                          <span className={isCompleted ? 'text-white' : 'text-zinc-600'}>
                             ●
                           </span>
-                          <span className={isCompleted ? 'line-through text-gray-500' : 'text-gray-300'}>
+                          <span className={isCompleted ? 'line-through text-zinc-500' : 'text-zinc-300'}>
                             {task}
                           </span>
                         </li>
@@ -226,7 +226,7 @@ export default function CurriculumOverview({ user }) {
             <div className="mt-8 border-t border-white/5 pt-4 flex justify-end">
               <button
                 onClick={() => setSelectedDayDetail(null)}
-                className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-semibold border border-white/5 transition-colors"
+                className="px-6 py-2 bg-white text-black hover:bg-zinc-200 rounded-lg text-xs font-semibold border border-white/5 transition-colors"
               >
                 Close Review
               </button>
