@@ -16,7 +16,7 @@ if (usePostgres) {
     ssl: {
       rejectUnauthorized: false
     },
-    connectionTimeoutMillis: 5000 // Fail fast (5s) if connection hangs (e.g. blocked port)
+    connectionTimeoutMillis: 15000 // Allow up to 15s for Neon Postgres cold-start
   });
 } else if (!isVercel) {
   console.log("Configuring SQLite database connection...");
