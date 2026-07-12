@@ -1,5 +1,3 @@
-const sqlite3 = require('sqlite3').verbose();
-const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
@@ -10,6 +8,7 @@ let pool;
 
 if (usePostgres) {
   console.log("Configuring PostgreSQL database connection...");
+  const { Pool } = require('pg');
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -18,6 +17,7 @@ if (usePostgres) {
   });
 } else {
   console.log("Configuring SQLite database connection...");
+  const sqlite3 = require('sqlite3').verbose();
   const dbPath = path.join(__dirname, 'db.sqlite');
   db = new sqlite3.Database(dbPath);
 }
