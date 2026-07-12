@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trophy, Flame, BookOpen, Clock, ArrowRight, Sparkles, Loader2, RefreshCw, CheckCircle2, User, Award, Shield, AlertTriangle } from 'lucide-react';
 import { api } from '../utils/api';
 
@@ -12,32 +12,10 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
   const [timelineSearch, setTimelineSearch] = useState('');
   
   const [selectedCompetitor, setSelectedCompetitor] = useState(null);
-  const [tipIndex, setTipIndex] = useState(0);
-  const [tipGlow, setTipGlow] = useState(false);
-
-  const banterTips = [
-    "Bubu, are you sleeping? Aroy is taking a 2-hour lead! Check in to catch up!",
-    "Aroy is currently leading the pack, but Bubu's streak is burning hot!",
-    "Keep pushing! The 180-day grind is a marathon, not a sprint.",
-    "Did you know? Completing a topic daily gives you +10 points to consistency!",
-    "Aroy and Bubu are battling it out in DSA & Cybersecurity. Who will win?",
-    "Study tip: Use the pomodoro timer in your workspace for maximum efficiency!",
-    "Cybersecurity tip: Always use strong passwords and enable multi-factor authentication!",
-    "DSA tip: Practice writing clean code and explaining your logic step-by-step.",
-    "Banter: Bubu is preparing a surprise cyber attack (study session) to dethrone Aroy!",
-    "Banter: Aroy has logged in for an early morning session to secure the crown!"
-  ];
-
-  const confettiRequestRef = useRef();
 
   useEffect(() => {
     fetchLeaderboardStats();
     fetchPublicCurriculum();
-    return () => {
-      if (confettiRequestRef.current) {
-        cancelAnimationFrame(confettiRequestRef.current);
-      }
-    };
   }, []);
 
   const fetchLeaderboardStats = async () => {
@@ -77,62 +55,6 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
     }
   };
 
-  // Zero-dependency pure Canvas Confetti animation (Monochrome Silver/White/Gray)
-  const triggerConfetti = () => {
-    const canvas = document.getElementById('confetti-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const particles = [];
-    const colors = ['#ffffff', '#f4f4f5', '#e4e4e7', '#d4d4d8', '#a1a1aa', '#71717a', '#ffffff'];
-    
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        x: canvas.width / 2,
-        y: canvas.height - 50,
-        vx: (Math.random() - 0.5) * 20,
-        vy: -Math.random() * 15 - 8,
-        size: Math.random() * 8 + 4,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 10
-      });
-    }
-
-    const update = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      let active = false;
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.35; // gravity
-        p.vx *= 0.98; // drag
-        p.rotation += p.rotationSpeed;
-        if (p.y < canvas.height + 20) {
-          active = true;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rotation * Math.PI) / 180);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-          ctx.restore();
-        }
-      });
-      if (active) {
-        confettiRequestRef.current = requestAnimationFrame(update);
-      }
-    };
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    update();
-  };
-
-  const cycleTip = () => {
-    setTipGlow(true);
-    setTipIndex((prev) => (prev + 1) % banterTips.length);
-    triggerConfetti();
-    setTimeout(() => setTipGlow(false), 500);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-darkBg flex flex-col items-center justify-center gap-4 text-glow-emerald">
@@ -169,9 +91,6 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
 
   return (
     <div className="min-h-screen px-4 py-8 md:py-16 relative overflow-hidden transition-colors duration-300">
-      {/* Canvas for zero-dependency confetti */}
-      <canvas id="confetti-canvas" className="fixed inset-0 pointer-events-none z-50 w-full h-full" />
-
       {/* Dynamic Background Glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/2 rounded-full blur-[160px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-white/2 rounded-full blur-[160px] pointer-events-none" />
@@ -191,7 +110,7 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
           <div className="flex items-center gap-3">
             <button 
               onClick={fetchLeaderboardStats}
-              className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-zinc-400 hover:text-white hover:border-white/30 transition-all flex items-center justify-center"
+              className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-zinc-400 hover:text-white hover:border-white/30 transition-all flex items-center justify-center cursor-pointer"
               title="Refresh Stats"
             >
               <RefreshCw size={16} />
@@ -212,38 +131,13 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
             <div className="flex gap-3 mt-1">
               <button 
                 onClick={fetchLeaderboardStats}
-                className="px-4 py-2 rounded-lg bg-white/10 text-white border border-white/25 hover:bg-white hover:text-black transition-all text-xs font-semibold flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg bg-white/10 text-white border border-white/25 hover:bg-white hover:text-black transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <RefreshCw size={12} /> Retry Server Check
               </button>
             </div>
           </div>
         )}
-
-        {/* Lead Spotlight Card */}
-        <div 
-          onClick={cycleTip}
-          className={`glass-panel rounded-2xl p-6 mb-10 text-center relative overflow-hidden group hover:border-white/25 transition-all duration-300 cursor-pointer ${
-            tipGlow ? 'shadow-[0_0_25px_rgba(255,255,255,0.08)] scale-[1.01]' : ''
-          }`}
-        >
-          <div className="absolute inset-0 bg-white/1 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="flex justify-center mb-3">
-            <div className="p-3 rounded-full bg-white/5 text-white group-hover:scale-110 transition-transform duration-300">
-              <Trophy size={32} />
-            </div>
-          </div>
-          <h2 className="text-2xl font-extrabold text-white mb-2">
-            <span className="text-zinc-300 uppercase tracking-wide">{leader}</span> is currently leading the board!
-          </h2>
-          <p className="text-sm text-zinc-300 max-w-lg mx-auto italic flex items-center justify-center gap-1.5 select-none">
-            <Sparkles size={16} className="text-white shrink-0 animate-pulse" />
-            "{banterTips[tipIndex]}"
-          </p>
-          <span className="inline-block mt-3 text-[10px] text-zinc-600 tracking-wider uppercase font-semibold group-hover:text-white transition-colors">
-            Click to trigger banter & confetti
-          </span>
-        </div>
 
         {/* Head to Head Comparison */}
         <div className="grid md:grid-cols-2 gap-8 mb-10">
@@ -266,7 +160,7 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
                   )}
                   <button 
                     onClick={() => setSelectedCompetitor(selectedCompetitor === 'aroy' ? null : 'aroy')}
-                    className="text-[10px] text-zinc-400 hover:text-white font-bold tracking-wider uppercase border border-white/10 px-2 py-0.5 rounded-md hover:bg-white/5 transition-all"
+                    className="text-[10px] text-zinc-400 hover:text-white font-bold tracking-wider uppercase border border-white/10 px-2 py-0.5 rounded-md hover:bg-white/5 transition-all cursor-pointer"
                   >
                     {selectedCompetitor === 'aroy' ? 'Hide Details' : 'View Details'}
                   </button>
@@ -303,10 +197,9 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
 
             <button
               onClick={() => {
-                triggerConfetti();
                 onSelectProfile('aroy');
               }}
-              className="w-full py-4 rounded-xl bg-white text-black font-extrabold text-sm hover:bg-zinc-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-lg shadow-white/10"
+              className="w-full py-4 rounded-xl bg-white text-black font-extrabold text-sm hover:bg-zinc-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-lg shadow-white/10 cursor-pointer"
             >
               Enter Workspace
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -331,7 +224,7 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
                   )}
                   <button 
                     onClick={() => setSelectedCompetitor(selectedCompetitor === 'bubu' ? null : 'bubu')}
-                    className="text-[10px] text-zinc-400 hover:text-white font-bold tracking-wider uppercase border border-white/10 px-2 py-0.5 rounded-md hover:bg-white/5 transition-all"
+                    className="text-[10px] text-zinc-400 hover:text-white font-bold tracking-wider uppercase border border-white/10 px-2 py-0.5 rounded-md hover:bg-white/5 transition-all cursor-pointer"
                   >
                     {selectedCompetitor === 'bubu' ? 'Hide Details' : 'View Details'}
                   </button>
@@ -368,10 +261,9 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
 
             <button
               onClick={() => {
-                triggerConfetti();
                 onSelectProfile('bubu');
               }}
-              className="w-full py-4 rounded-xl bg-zinc-800 text-white font-extrabold text-sm hover:bg-zinc-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-lg border border-white/10"
+              className="w-full py-4 rounded-xl bg-zinc-800 text-white font-extrabold text-sm hover:bg-zinc-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-lg border border-white/10 cursor-pointer"
             >
               Enter Workspace
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -390,7 +282,7 @@ export default function LeaderboardDashboard({ onSelectProfile, profileError, cl
               </h3>
               <button 
                 onClick={() => setSelectedCompetitor(null)}
-                className="p-1 rounded bg-black/25 text-zinc-400 hover:text-white"
+                className="p-1 rounded bg-black/25 text-zinc-400 hover:text-white cursor-pointer"
               >
                 ✕
               </button>
