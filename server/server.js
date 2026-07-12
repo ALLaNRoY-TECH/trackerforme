@@ -12,7 +12,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'grind-tracker-secret-key-180-days-
 
 // CORS configuration
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (origin.startsWith('http://localhost:') || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
@@ -691,7 +697,11 @@ app.get('/api/stats/analytics', requireAuth, async (req, res) => {
   }
 });
 
-// Start Express Listener
-app.listen(PORT, () => {
-  console.log(`Grind Tracker server running on port ${PORT}`);
-});
+// Start Express Listener if run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Grind Tracker server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
