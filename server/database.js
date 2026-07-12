@@ -5,6 +5,7 @@ const usePostgres = !!process.env.DATABASE_URL;
 
 let db;
 let pool;
+let isPostgresActive = usePostgres;
 
 if (usePostgres) {
   console.log("Configuring PostgreSQL database connection...");
@@ -13,7 +14,8 @@ if (usePostgres) {
     connectionString: process.env.DATABASE_URL,
     ssl: {
       rejectUnauthorized: false
-    }
+    },
+    connectionTimeoutMillis: 3000 // Fail fast (3s) if connection hangs (e.g. blocked port)
   });
 } else {
   console.log("Configuring SQLite database connection...");
@@ -24,14 +26,14 @@ if (usePostgres) {
 
 // Convert SQLite parameter placeholders (?) to PostgreSQL ($1, $2...)
 function queryParams(sql, params) {
-  if (!usePostgres) return { sql, params };
+  if (!isPostgresActive) return { sql, params };
   let index = 1;
   const pgSql = sql.replace(/\?/g, () => `$${index++}`);
   return { sql: pgSql, params };
 }
 
 const run = async (sql, params = []) => {
-  if (usePostgres) {
+  if (isPostgresActive) {
     const pg = queryParams(sql, params);
     let cleanSql = pg.sql;
     
@@ -55,7 +57,7 @@ const run = async (sql, params = []) => {
 };
 
 const get = async (sql, params = []) => {
-  if (usePostgres) {
+  if (isPostgresActive) {
     const pg = queryParams(sql, params);
     const res = await pool.query(pg.sql, pg.params);
     return res.rows[0] || null;
@@ -70,7 +72,7 @@ const get = async (sql, params = []) => {
 };
 
 const all = async (sql, params = []) => {
-  if (usePostgres) {
+  if (isPostgresActive) {
     const pg = queryParams(sql, params);
     const res = await pool.query(pg.sql, pg.params);
     return res.rows;
@@ -85,7 +87,7 @@ const all = async (sql, params = []) => {
 };
 
 const exec = async (sql) => {
-  if (usePostgres) {
+  if (isPostgresActive) {
     // Postgres compatible schema migrations
     let cleanSql = sql
       .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, 'SERIAL PRIMARY KEY')
@@ -104,8 +106,26 @@ const exec = async (sql) => {
 };
 
 async function initDb() {
+  if (isPostgresActive) {
+    try {
+      console.log("Verifying PostgreSQL connectivity...");
+      // Run quick query to test connection
+      await pool.query("SELECT 1");
+      console.log("PostgreSQL connection verified successfully.");
+    } catch (pgErr) {
+      console.warn("PostgreSQL connection failed to establish:", pgErr.message);
+      console.warn("Falling back to local SQLite database...");
+      isPostgresActive = false;
+      
+      // Initialize SQLite instead
+      const sqlite3 = require('sqlite3').verbose();
+      const dbPath = path.join(__dirname, 'db.sqlite');
+      db = new sqlite3.Database(dbPath);
+    }
+  }
+
   try {
-    if (!usePostgres) {
+    if (!isPostgresActive) {
       // Enable foreign keys in SQLite
       await run("PRAGMA foreign_keys = ON;");
     }
@@ -176,7 +196,7 @@ async function initDb() {
       if (fs.existsSync(curriculumPath)) {
         const curriculumData = JSON.parse(fs.readFileSync(curriculumPath, 'utf8'));
         
-        if (usePostgres) {
+        if (isPostgresActive) {
           console.log("Running Postgres bulk insert...");
           for (const day of curriculumData) {
             await run(
